@@ -577,7 +577,7 @@ async def api_lnurlscan(code: str, wallet: WalletTypeInfo = Depends(get_key_type
         if len(name_domain) == 2 and len(name_domain[1].split(".")) >= 2:
             name, domain = name_domain
             url = (
-                ("http://" if domain.endswith(".onion") else "https://")
+                ("http://" if domain.endswith(".onion") or domain.endswith(".nostr") else "https://")
                 + domain
                 + "/.well-known/lnurlp/"
                 + name
