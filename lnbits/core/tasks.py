@@ -4,6 +4,7 @@ from typing import Dict
 import httpx
 from loguru import logger
 
+from lnbits.async_httpx_nostr_client import AsyncHttpxNostrClient
 from lnbits.core.crud import (
     get_balance_notify,
     get_wallet,
@@ -118,7 +119,7 @@ async def wait_for_paid_invoices(invoice_paid_queue: asyncio.Queue):
         url = await get_balance_notify(payment.wallet_id)
         if url:
             headers = {"User-Agent": settings.user_agent}
-            async with httpx.AsyncClient(headers=headers) as client:
+            async with AsyncHttpxNostrClient(headers=headers) as client:
                 try:
                     r = await client.post(url, timeout=4)
                     await mark_webhook_sent(payment, r.status_code)
@@ -151,7 +152,7 @@ async def dispatch_webhook(payment: Payment):
         return await mark_webhook_sent(payment, -1)
 
     headers = {"User-Agent": settings.user_agent}
-    async with httpx.AsyncClient(headers=headers) as client:
+    async with AsyncHttpxNostrClient(headers=headers) as client:
         data = payment.dict()
         try:
             r = await client.post(payment.webhook, json=data, timeout=40)

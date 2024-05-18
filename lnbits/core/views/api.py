@@ -26,6 +26,7 @@ from sse_starlette.sse import EventSourceResponse
 from starlette.responses import StreamingResponse
 
 from lnbits import bolt11
+from lnbits.async_httpx_nostr_client import AsyncHttpxNostrClient
 from lnbits.core.db import core_app_extra, db
 from lnbits.core.helpers import (
     migrate_extension_database,
@@ -291,7 +292,7 @@ async def api_payments_create_invoice(data: CreateInvoice, wallet: Wallet):
             await save_balance_check(wallet.id, data.lnurl_balance_check)
 
         headers = {"User-Agent": settings.user_agent}
-        async with httpx.AsyncClient(headers=headers) as client:
+        async with AsyncHttpxNostrClient(headers=headers) as client:
             try:
                 r = await client.get(
                     data.lnurl_callback,
@@ -407,7 +408,7 @@ async def api_payments_pay_lnurl(
     domain = urlparse(data.callback).netloc
 
     headers = {"User-Agent": settings.user_agent}
-    async with httpx.AsyncClient(headers=headers, follow_redirects=True) as client:
+    async with AsyncHttpxNostrClient(headers=headers, follow_redirects=True) as client:
         try:
             if data.unit and data.unit != "sat":
                 amount_msat = await fiat_amount_as_satoshis(data.amount, data.unit)
@@ -600,7 +601,7 @@ async def api_lnurlscan(code: str, wallet: WalletTypeInfo = Depends(get_key_type
         params.update(pubkey=lnurlauth_key.verifying_key.to_string("compressed").hex())
     else:
         headers = {"User-Agent": settings.user_agent}
-        async with httpx.AsyncClient(headers=headers, follow_redirects=True) as client:
+        async with AsyncHttpxNostrClient(headers=headers, follow_redirects=True) as client:
             r = await client.get(url, timeout=5)
             r.raise_for_status()
             if r.is_error:

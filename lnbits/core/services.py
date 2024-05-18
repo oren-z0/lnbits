@@ -7,7 +7,6 @@ from pathlib import Path
 from typing import Dict, List, Optional, Tuple, TypedDict
 from urllib.parse import parse_qs, urlparse
 
-import httpx
 from bolt11 import Bolt11
 from bolt11 import decode as bolt11_decode
 from cryptography.hazmat.primitives import serialization
@@ -16,6 +15,7 @@ from loguru import logger
 from py_vapid import Vapid
 from py_vapid.utils import b64urlencode
 
+from lnbits.async_httpx_nostr_client import AsyncHttpxNostrClient
 from lnbits.core.db import db
 from lnbits.db import Connection
 from lnbits.decorators import WalletTypeInfo, require_admin_key
@@ -451,7 +451,7 @@ async def redeem_lnurl_withdraw(
     res = {}
 
     headers = {"User-Agent": settings.user_agent}
-    async with httpx.AsyncClient(headers=headers) as client:
+    async with AsyncHttpxNostrClient(headers=headers) as client:
         lnurl = decode_lnurl(lnurl_request)
         r = await client.get(str(lnurl))
         res = r.json()
@@ -486,7 +486,7 @@ async def redeem_lnurl_withdraw(
         pass
 
     headers = {"User-Agent": settings.user_agent}
-    async with httpx.AsyncClient(headers=headers) as client:
+    async with AsyncHttpxNostrClient(headers=headers) as client:
         try:
             await client.get(res["callback"], params=params)
         except Exception:
@@ -550,7 +550,7 @@ async def perform_lnurlauth(
     sig = key.sign_digest_deterministic(k1, sigencode=encode_strict_der)
 
     headers = {"User-Agent": settings.user_agent}
-    async with httpx.AsyncClient(headers=headers) as client:
+    async with AsyncHttpxNostrClient(headers=headers) as client:
         assert key.verifying_key, "LNURLauth verifying_key does not exist"
         r = await client.get(
             callback,
