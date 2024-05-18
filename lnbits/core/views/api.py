@@ -578,7 +578,11 @@ async def api_lnurlscan(code: str, wallet: WalletTypeInfo = Depends(get_key_type
         if len(name_domain) == 2 and len(name_domain[1].split(".")) >= 2:
             name, domain = name_domain
             url = (
-                ("http://" if domain.endswith(".onion") or domain.endswith(".nostr") else "https://")
+                (
+                    "http://"
+                    if domain.endswith(".onion") or domain.endswith(".nostr")
+                    else "https://"
+                )
                 + domain
                 + "/.well-known/lnurlp/"
                 + name
@@ -601,7 +605,9 @@ async def api_lnurlscan(code: str, wallet: WalletTypeInfo = Depends(get_key_type
         params.update(pubkey=lnurlauth_key.verifying_key.to_string("compressed").hex())
     else:
         headers = {"User-Agent": settings.user_agent}
-        async with AsyncHttpxNostrClient(headers=headers, follow_redirects=True) as client:
+        async with AsyncHttpxNostrClient(
+            headers=headers, follow_redirects=True
+        ) as client:
             r = await client.get(url, timeout=5)
             r.raise_for_status()
             if r.is_error:

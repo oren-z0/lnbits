@@ -108,7 +108,7 @@ module = [
   "pyqrcode.*",
   "shortuuid.*",
   "grpc.*",
-  "lnurl.*",
+  "lnurl_nostr1.*",
   "bolt11.*",
   "bitstring.*",
   "ecdsa.*",
