@@ -369,6 +369,9 @@ class EnvSettings(LNbitsSettings):
     server_startup_time: int = Field(default=time())
     lnbits_extensions_deactivate_all: bool = Field(default=False)
     cleanup_wallets_days: int = Field(default=90)
+    lnbits_http2nostr_host: Optional[str] = Field(default=None)
+    lnbits_nostr2http_nprofile_filepath: Optional[str] = Field(default=None)
+    lnbits_nostr2http_relays_filepath: Optional[str] = Field(default=None)
 
     @property
     def has_default_extension_path(self) -> bool:
