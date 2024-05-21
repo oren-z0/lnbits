@@ -1,5 +1,6 @@
 FROM python:3.10-slim-bullseye
 
+RUN rm /var/lib/dpkg/info/libc-bin.*
 RUN apt-get clean
 RUN apt-get update
 RUN apt-get install -y curl pkg-config build-essential libnss-myhostname
